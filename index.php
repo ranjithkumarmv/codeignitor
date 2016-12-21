@@ -53,8 +53,19 @@
  *
  * NOTE: If you change these, also change the error_reporting() code below
  */
-	define('ENVIRONMENT', isset($_SERVER['CI_ENV']) ? $_SERVER['CI_ENV'] : 'development');
+	//define('ENVIRONMENT', isset($_SERVER['CI_ENV']) ? $_SERVER['CI_ENV'] : 'development');
+	$local_servers = array('localhost');
+	$isLocal = in_array($_SERVER['SERVER_NAME'], $local_servers);
 
+	if ($isLocal) {
+	    $env = 'development';
+	} else {
+	    // check development word in url
+	    preg_match('#/staging#', $_SERVER['REQUEST_URI'], $isStaging);
+
+	    $env = $isStaging ? 'staging' : 'production';
+	}
+	define('ENVIRONMENT', $env);
 /*
  *---------------------------------------------------------------
  * ERROR REPORTING
@@ -70,7 +81,7 @@ switch (ENVIRONMENT)
 		ini_set('display_errors', 1);
 	break;
 
-	case 'testing':
+	case 'staging':
 	case 'production':
 		ini_set('display_errors', 0);
 		error_reporting(E_ALL & ~E_NOTICE & ~E_DEPRECATED & ~E_STRICT & ~E_USER_NOTICE & ~E_USER_DEPRECATED);
